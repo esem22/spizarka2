@@ -12,3 +12,10 @@ Pierwsza wersja testowa.
 - zużycie działa metodą FEFO,
 - dodano sensory zbiorcze: produkty, łączny stan, niski stan, krótki termin i przeterminowane,
 - przygotowano strukturę pod dalszą rozbudowę o panel, EAN, listę zakupów i Niimbot.
+
+### HACS
+- przygotowano repozytorium pod instalację przez HACS jako Custom Repository,
+- dodano `hacs.json`,
+- dodano zasoby `brand/icon.png`,
+- dodano workflow `.github/workflows/validate.yml` do walidacji HACS,
+- zaktualizowano adres repozytorium do `esem22/spizarka2`.

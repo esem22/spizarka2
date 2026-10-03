@@ -2,7 +2,7 @@
 
 Własna integracja magazynowa dla Home Assistant, rozwijana w stylu Grocy.
 
-Repozytorium: https://github.com/esem22/spizarka
+Repozytorium: https://github.com/esem22/spizarka2
 
 ## Wersja 0.1.0
 
@@ -17,6 +17,20 @@ Pierwsza wersja testowa zawiera:
 - zużywanie stanu metodą FEFO,
 - przenoszenie stanu pomiędzy lokalizacjami,
 - sensory zbiorcze do automatyzacji.
+
+
+## Instalacja przez HACS
+
+1. Otwórz **HACS** w Home Assistant.
+2. Wejdź w **Integracje**.
+3. Kliknij menu z trzema kropkami w prawym górnym rogu i wybierz **Niestandardowe repozytoria / Custom repositories**.
+4. Dodaj repozytorium `https://github.com/esem22/spizarka2`.
+5. Jako typ wybierz **Integration**.
+6. Dodaj repozytorium, wyszukaj **Spiżarka** i wybierz **Pobierz / Download**.
+7. Uruchom ponownie Home Assistant.
+8. Wejdź w **Ustawienia → Urządzenia i usługi → Dodaj integrację** i dodaj **Spiżarka**.
+
+Po kolejnych aktualizacjach nowe wersje będzie można instalować bezpośrednio z HACS.
 
 ## Instalacja ręczna
 
