@@ -1,21 +1,27 @@
 # Historia zmian
 
-## 0.1.0 — 2026-10-03
+## 0.2.0
 
-Pierwsza wersja testowa.
+- dodano własny panel **Spiżarka** w menu bocznym Home Assistant,
+- lista produktów z ilością, kategorią, lokalizacją i najbliższym terminem ważności,
+- wyszukiwarka po nazwie, EAN i kategorii,
+- filtry po lokalizacji i kategorii,
+- widoki **Kończy się termin** i **Niski stan**,
+- dodawanie produktu bezpośrednio z panelu,
+- dodawanie partii/stanu z datą ważności,
+- zużywanie produktu metodą FEFO z panelu,
+- przenoszenie produktu pomiędzy lokalizacjami z panelu,
+- zachowana pełna zgodność danych z wersją 0.1.0,
+- przygotowanie repozytorium nadal zgodne z instalacją przez HACS.
 
-- dodano config flow i instalację przez interfejs Home Assistant,
-- dodano trwały magazyn danych,
-- dodano produkty i lokalizacje,
-- dodano partie z ilością i terminem ważności,
-- dodano operacje dodawania, zużycia i przenoszenia stanu,
-- zużycie działa metodą FEFO,
-- dodano sensory zbiorcze: produkty, łączny stan, niski stan, krótki termin i przeterminowane,
-- przygotowano strukturę pod dalszą rozbudowę o panel, EAN, listę zakupów i Niimbot.
+## 0.1.0
 
-### HACS
-- przygotowano repozytorium pod instalację przez HACS jako Custom Repository,
-- dodano `hacs.json`,
-- dodano zasoby `brand/icon.png`,
-- dodano workflow `.github/workflows/validate.yml` do walidacji HACS,
-- zaktualizowano adres repozytorium do `esem22/spizarka2`.
+- pierwsza działająca wersja integracji,
+- konfiguracja przez GUI,
+- produkty, EAN, kategorie, jednostki i stany minimalne,
+- lokalizacje magazynowe,
+- partie z ilością i datą ważności,
+- dodawanie, zużywanie i przenoszenie stanu,
+- zużywanie metodą FEFO,
+- sensory zbiorcze,
+- instalacja przez HACS jako niestandardowe repozytorium.

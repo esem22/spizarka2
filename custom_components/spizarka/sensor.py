@@ -57,7 +57,7 @@ class SpizarkaProductsSensor(SpizarkaBaseSensor):
             item = dict(product)
             item["quantity"] = totals.get(product["id"], 0.0)
             products.append(item)
-        return {"products": products, "locations": self.manager.data["locations"]}
+        return {"spizarka_kind": "products", "products": products, "locations": self.manager.data["locations"]}
 
 
 class SpizarkaStockSensor(SpizarkaBaseSensor):
@@ -70,7 +70,7 @@ class SpizarkaStockSensor(SpizarkaBaseSensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {"batches": self.manager.data["batches"]}
+        return {"spizarka_kind": "stock", "batches": self.manager.data["batches"]}
 
 
 class SpizarkaLowStockSensor(SpizarkaBaseSensor):
@@ -83,7 +83,7 @@ class SpizarkaLowStockSensor(SpizarkaBaseSensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {"products": self.manager.low_stock_products()}
+        return {"spizarka_kind": "low_stock", "products": self.manager.low_stock_products()}
 
 
 class SpizarkaExpiringSensor(SpizarkaBaseSensor):
@@ -96,7 +96,7 @@ class SpizarkaExpiringSensor(SpizarkaBaseSensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {"days": 7, "batches": self.manager.expiring_batches(7)}
+        return {"spizarka_kind": "expiring", "days": 7, "batches": self.manager.expiring_batches(7)}
 
 
 class SpizarkaExpiredSensor(SpizarkaBaseSensor):
@@ -109,4 +109,4 @@ class SpizarkaExpiredSensor(SpizarkaBaseSensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {"batches": self.manager.expired_batches()}
+        return {"spizarka_kind": "expired", "batches": self.manager.expired_batches()}

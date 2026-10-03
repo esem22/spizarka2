@@ -4,121 +4,59 @@ Własna integracja magazynowa dla Home Assistant, rozwijana w stylu Grocy.
 
 Repozytorium: https://github.com/esem22/spizarka2
 
-## Wersja 0.1.0
+## Wersja 0.2.0
 
-Pierwsza wersja testowa zawiera:
+Wersja 0.2.0 dodaje własny panel **Spiżarka** w menu bocznym Home Assistant. Dane utworzone w 0.1.0 są zachowywane.
 
-- konfigurację przez GUI Home Assistant,
-- lokalny zapis danych przez Home Assistant Store,
-- produkty: nazwa, EAN, kategoria, jednostka, stan minimalny,
-- lokalizacje magazynowe,
-- partie produktu z ilością i datą ważności,
-- dodawanie stanu,
+Panel umożliwia:
+
+- przeglądanie produktów,
+- wyszukiwanie po nazwie, EAN i kategorii,
+- filtrowanie po lokalizacji i kategorii,
+- podgląd stanu i najbliższego terminu ważności,
+- dodawanie nowych produktów,
+- dodawanie partii z datą ważności,
 - zużywanie stanu metodą FEFO,
 - przenoszenie stanu pomiędzy lokalizacjami,
-- sensory zbiorcze do automatyzacji.
+- widok produktów z krótkim terminem,
+- widok produktów poniżej stanu minimalnego.
 
+## Aktualizacja przez HACS
 
-## Instalacja przez HACS
+1. Wgraj pliki wersji 0.2.0 do repozytorium `https://github.com/esem22/spizarka2`.
+2. W HACS otwórz **Spiżarka**.
+3. Odśwież informacje o repozytorium, jeśli aktualizacja nie pojawi się od razu.
+4. Pobierz najnowszą wersję.
+5. Uruchom ponownie Home Assistant.
+6. Po restarcie w menu bocznym pojawi się pozycja **Spiżarka**.
 
-1. Otwórz **HACS** w Home Assistant.
-2. Wejdź w **Integracje**.
-3. Kliknij menu z trzema kropkami w prawym górnym rogu i wybierz **Niestandardowe repozytoria / Custom repositories**.
-4. Dodaj repozytorium `https://github.com/esem22/spizarka2`.
-5. Jako typ wybierz **Integration**.
-6. Dodaj repozytorium, wyszukaj **Spiżarka** i wybierz **Pobierz / Download**.
-7. Uruchom ponownie Home Assistant.
-8. Wejdź w **Ustawienia → Urządzenia i usługi → Dodaj integrację** i dodaj **Spiżarka**.
+## Pierwsza instalacja przez HACS
 
-Po kolejnych aktualizacjach nowe wersje będzie można instalować bezpośrednio z HACS.
-
-## Instalacja ręczna
-
-1. Rozpakuj ZIP.
-2. Skopiuj katalog `custom_components/spizarka` do `/config/custom_components/spizarka` w Home Assistant.
-3. Uruchom ponownie Home Assistant.
-4. Wejdź w `Ustawienia -> Urządzenia i usługi -> Dodaj integrację`.
-5. Wyszukaj `Spiżarka` i dodaj integrację.
-
-## Test v0.1.0
-
-Operacje są dostępne w `Narzędzia deweloperskie -> Akcje`.
-
-### 1. Dodaj produkt
-
-Akcja: `spizarka.add_product`
-
-Przykład:
-
-```yaml
-name: Mleko 3,2%
-ean: "5901234567890"
-category: Nabiał
-unit: szt.
-minimum: 2
-```
-
-### 2. Dodaj stan
-
-Akcja: `spizarka.add_stock`
-
-```yaml
-ean: "5901234567890"
-quantity: 4
-location: Lodówka
-expiry_date: "2026-10-10"
-```
-
-### 3. Zużyj produkt
-
-Akcja: `spizarka.consume_stock`
-
-```yaml
-ean: "5901234567890"
-quantity: 1
-```
-
-Jeśli produkt ma kilka partii, zużywana jest najpierw partia z najbliższym terminem ważności.
-
-### 4. Przenieś produkt
-
-Akcja: `spizarka.move_stock`
-
-```yaml
-ean: "5901234567890"
-quantity: 1
-from_location: Lodówka
-to_location: Spiżarnia
-```
+1. HACS → **Integracje**.
+2. Menu z trzema kropkami → **Niestandardowe repozytoria**.
+3. Repozytorium: `https://github.com/esem22/spizarka2`.
+4. Typ: **Integration**.
+5. Dodaj repozytorium i pobierz **Spiżarka**.
+6. Uruchom ponownie Home Assistant.
+7. Ustawienia → Urządzenia i usługi → Dodaj integrację → **Spiżarka**.
 
 ## Domyślne lokalizacje
-
-Po pierwszym uruchomieniu tworzone są:
 
 - Spiżarnia
 - Lodówka
 - Zamrażarka
 - Apteczka
 
-Dodatkowe lokalizacje można tworzyć akcją `spizarka.add_location`.
-
 ## Sensory
 
-Integracja tworzy sensory zbiorcze:
+Integracja zachowuje sensory zbiorcze:
 
-- `sensor.spizarka_produkty`
-- `sensor.spizarka_laczny_stan`
-- `sensor.spizarka_niski_stan`
-- `sensor.spizarka_krotki_termin`
-- `sensor.spizarka_przeterminowane`
+- Produkty,
+- Łączny stan,
+- Niski stan,
+- Krótki termin,
+- Przeterminowane.
 
-Nazwy `entity_id` mogą zostać automatycznie dostosowane przez Home Assistant.
+## Dane
 
-## Plan dalszych wersji
-
-- panel Spiżarki w interfejsie HA,
-- edycja i usuwanie produktów,
-- skanowanie EAN,
-- automatyczna lista zakupów,
-- pobieranie informacji o produktach po EAN,
-- etykiety i drukarki Niimbot.
+Produkty i partie są zapisywane przez mechanizm Home Assistant Store. Aktualizacja z 0.1.0 do 0.2.0 nie zmienia formatu danych.
