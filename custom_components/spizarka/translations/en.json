@@ -1,0 +1,14 @@
+{
+  "title": "Pantry",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pantry",
+        "description": "Create a local product inventory in Home Assistant."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Pantry is already configured."
+    }
+  }
+}

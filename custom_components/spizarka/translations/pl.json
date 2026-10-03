@@ -1,0 +1,14 @@
+{
+  "title": "Spiżarka",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Spiżarka",
+        "description": "Utwórz lokalny magazyn produktów w Home Assistant."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Spiżarka jest już skonfigurowana."
+    }
+  }
+}

@@ -1,0 +1,141 @@
+add_product:
+  name: Dodaj produkt
+  description: Dodaje nowy produkt do Spiżarki.
+  fields:
+    name:
+      name: Nazwa
+      required: true
+      example: Mleko 3,2%
+      selector:
+        text:
+    ean:
+      name: EAN
+      example: "5901234567890"
+      selector:
+        text:
+    category:
+      name: Kategoria
+      example: Nabiał
+      selector:
+        text:
+    unit:
+      name: Jednostka
+      default: szt.
+      selector:
+        text:
+    minimum:
+      name: Stan minimalny
+      default: 0
+      selector:
+        number:
+          min: 0
+          step: 0.1
+
+add_location:
+  name: Dodaj lokalizację
+  description: Dodaje nową lokalizację magazynową.
+  fields:
+    name:
+      name: Nazwa
+      required: true
+      example: Szafka kuchenna
+      selector:
+        text:
+
+add_stock:
+  name: Dodaj stan
+  description: Dodaje partię produktu do wybranej lokalizacji.
+  fields:
+    product_id:
+      name: ID produktu
+      selector:
+        text:
+    ean:
+      name: EAN produktu
+      selector:
+        text:
+    name:
+      name: Nazwa produktu
+      selector:
+        text:
+    quantity:
+      name: Ilość
+      required: true
+      selector:
+        number:
+          min: 0.001
+          step: 0.1
+    location:
+      name: Lokalizacja
+      required: true
+      example: Lodówka
+      selector:
+        text:
+    expiry_date:
+      name: Data ważności
+      description: Format RRRR-MM-DD.
+      selector:
+        date:
+
+consume_stock:
+  name: Zużyj stan
+  description: Zdejmuje ilość produktu metodą FEFO — najpierw partie z najbliższym terminem ważności.
+  fields:
+    product_id:
+      name: ID produktu
+      selector:
+        text:
+    ean:
+      name: EAN produktu
+      selector:
+        text:
+    name:
+      name: Nazwa produktu
+      selector:
+        text:
+    quantity:
+      name: Ilość
+      required: true
+      selector:
+        number:
+          min: 0.001
+          step: 0.1
+    location:
+      name: Lokalizacja
+      description: Opcjonalnie ogranicza zużycie do jednej lokalizacji.
+      selector:
+        text:
+
+move_stock:
+  name: Przenieś stan
+  description: Przenosi produkt pomiędzy lokalizacjami, zachowując terminy ważności partii.
+  fields:
+    product_id:
+      name: ID produktu
+      selector:
+        text:
+    ean:
+      name: EAN produktu
+      selector:
+        text:
+    name:
+      name: Nazwa produktu
+      selector:
+        text:
+    quantity:
+      name: Ilość
+      required: true
+      selector:
+        number:
+          min: 0.001
+          step: 0.1
+    from_location:
+      name: Z lokalizacji
+      required: true
+      selector:
+        text:
+    to_location:
+      name: Do lokalizacji
+      required: true
+      selector:
+        text:
