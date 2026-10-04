@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN, PLATFORMS
+from .ean_lookup import async_lookup_ean
 from .manager import SpizarkaManager
 from .panel import async_register_panel, async_unregister_panel
 
@@ -42,6 +44,10 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             call.data.get("category"),
             call.data.get("unit", "szt."),
             call.data.get("minimum", 0),
+            call.data.get("brand"),
+            call.data.get("package_quantity"),
+            call.data.get("image_url"),
+            call.data.get("source"),
         )
 
     async def handle_add_location(call: ServiceCall) -> None:
@@ -80,6 +86,10 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             vol.Optional("category"): cv.string,
             vol.Optional("unit", default="szt."): cv.string,
             vol.Optional("minimum", default=0): vol.Coerce(float),
+            vol.Optional("brand"): cv.string,
+            vol.Optional("package_quantity"): cv.string,
+            vol.Optional("image_url"): cv.string,
+            vol.Optional("source"): cv.string,
         }),
     )
     hass.services.async_register(
@@ -120,6 +130,24 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             vol.Required("to_location"): cv.string,
         }),
     )
+
+    @websocket_api.async_response
+    @websocket_api.websocket_command(
+        {
+            vol.Required("type"): "spizarka/lookup_ean",
+            vol.Required("ean"): cv.string,
+        }
+    )
+    async def websocket_lookup_ean(hass: HomeAssistant, connection, msg: dict) -> None:
+        """Look up a product by EAN/GTIN for the Spiżarka panel."""
+        try:
+            result = await async_lookup_ean(hass, msg["ean"])
+        except HomeAssistantError as err:
+            connection.send_error(msg["id"], "lookup_failed", str(err))
+            return
+        connection.send_result(msg["id"], result)
+
+    websocket_api.async_register_command(hass, websocket_lookup_ean)
     return True
 
 

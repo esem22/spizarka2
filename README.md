@@ -4,9 +4,21 @@ Własna integracja magazynowa dla Home Assistant, rozwijana w stylu Grocy.
 
 Repozytorium: https://github.com/esem22/spizarka2
 
-## Wersja 0.2.0
+## Wersja 0.2.1
 
-Wersja 0.2.0 dodaje własny panel **Spiżarka** w menu bocznym Home Assistant. Dane utworzone w 0.1.0 są zachowywane.
+Wersja 0.2.1 dodaje pobieranie danych produktu po kodzie EAN/GTIN z Open Food Facts. Dane i funkcje z wcześniejszych wersji są zachowywane.
+
+### Pobieranie produktu po EAN
+
+1. Otwórz panel **Spiżarka**.
+2. Kliknij **+ Produkt**.
+3. Wpisz lub zeskanuj kod EAN.
+4. Kliknij **Pobierz po EAN** albo naciśnij Enter.
+5. Integracja spróbuje uzupełnić nazwę, markę, kategorię i wielkość opakowania.
+6. Sprawdź dane i kliknij **Dodaj**.
+
+Jeżeli produktu nie ma w Open Food Facts, formularz pozostaje dostępny do ręcznego uzupełnienia.
+
 
 Panel umożliwia:
 
@@ -23,7 +35,7 @@ Panel umożliwia:
 
 ## Aktualizacja przez HACS
 
-1. Wgraj pliki wersji 0.2.0 do repozytorium `https://github.com/esem22/spizarka2`.
+1. Wgraj pliki wersji 0.2.1 do repozytorium `https://github.com/esem22/spizarka2`.
 2. W HACS otwórz **Spiżarka**.
 3. Odśwież informacje o repozytorium, jeśli aktualizacja nie pojawi się od razu.
 4. Pobierz najnowszą wersję.
@@ -59,4 +71,4 @@ Integracja zachowuje sensory zbiorcze:
 
 ## Dane
 
-Produkty i partie są zapisywane przez mechanizm Home Assistant Store. Aktualizacja z 0.1.0 do 0.2.0 nie zmienia formatu danych.
+Produkty i partie są zapisywane przez mechanizm Home Assistant Store. Aktualizacja do 0.2.1 jest zgodna z danymi zapisanymi przez wcześniejsze wersje.

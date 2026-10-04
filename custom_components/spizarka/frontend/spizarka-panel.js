@@ -9,6 +9,7 @@ class SpizarkaPanel extends HTMLElement {
     this._category = '';
     this._dialog = null;
     this._message = '';
+    this._lookupBusy = false;
   }
 
   set hass(hass) {
@@ -137,7 +138,7 @@ class SpizarkaPanel extends HTMLElement {
         @media(max-width:800px){.filters{grid-template-columns:1fr}.card{overflow:auto}table{min-width:850px}.wrap{padding:12px}}
       </style>
       <div class="wrap">
-        <div class="top"><h1>🥫 Spiżarka <span class="version">v${this.esc(this._panel?.config?.version || '0.2.0')}</span></h1><div class="actions"><button id="addProduct">+ Produkt</button><button class="secondary" id="addStock">+ Dodaj stan</button></div></div>
+        <div class="top"><h1>🥫 Spiżarka <span class="version">v${this.esc(this._panel?.config?.version || '0.2.1')}</span></h1><div class="actions"><button id="addProduct">+ Produkt</button><button class="secondary" id="addStock">+ Dodaj stan</button></div></div>
         ${this._message ? `<div class="message">${this.esc(this._message)}</div>` : ''}
         <div class="tabs">
           <button class="tab ${this._tab==='products'?'active':''}" data-tab="products">Produkty (${products.length})</button>
@@ -160,7 +161,7 @@ class SpizarkaPanel extends HTMLElement {
     if (!products.length) return '<div class="empty">Brak produktów spełniających warunki.</div>';
     return `<table><thead><tr><th>Produkt</th><th>Kategoria</th><th>Lokalizacja</th><th>Ilość</th><th>${expiryView?'Termin':'Najbliższy termin'}</th><th>Akcje</th></tr></thead><tbody>${products.map(p=>`
       <tr>
-        <td><div class="name">${this.esc(p.name)}</div><div class="sub">${p.ean ? `EAN: ${this.esc(p.ean)}` : 'bez EAN'}</div></td>
+        <td><div class="name">${this.esc(p.name)}</div><div class="sub">${p.brand ? `${this.esc(p.brand)} • ` : ''}${p.ean ? `EAN: ${this.esc(p.ean)}` : 'bez EAN'}${p.package_quantity ? ` • ${this.esc(p.package_quantity)}` : ''}</div></td>
         <td>${this.esc(p.category || '—')}</td>
         <td>${p.locations.length ? p.locations.map(x=>this.esc(x)).join(', ') : '<span class="muted">brak stanu</span>'}</td>
         <td class="qty">${this.fmt(p.quantity)} ${this.esc(p.unit || '')}<div class="sub">min. ${this.fmt(p.minimum || 0)}</div></td>
@@ -175,7 +176,9 @@ class SpizarkaPanel extends HTMLElement {
     const product = products.find(p => p.id === this._dialog.productId);
     const locOptions = locations.map(l=>`<option value="${this.esc(l.name)}">${this.esc(l.name)}</option>`).join('');
     if (this._dialog.type === 'product') return `<div class="overlay"><div class="dialog"><h2>Dodaj produkt</h2><div class="form">
-      <label>Nazwa<input id="f_name" autofocus></label><label>EAN<input id="f_ean" inputmode="numeric"></label><label>Kategoria<input id="f_category"></label><label>Jednostka<input id="f_unit" value="szt."></label><label>Stan minimalny<input id="f_minimum" type="number" min="0" step="0.1" value="0"></label>
+      <label>EAN / kod kreskowy<div style="display:flex;gap:8px"><input id="f_ean" inputmode="numeric" autocomplete="off" style="flex:1"><button type="button" id="lookupEan" class="secondary" style="white-space:nowrap">Pobierz po EAN</button></div><span id="lookupStatus" class="hint">Dane produktu są pobierane z Open Food Facts.</span></label>
+      <label>Nazwa<input id="f_name" autofocus></label><label>Marka<input id="f_brand"></label><label>Kategoria<input id="f_category"></label><label>Wielkość opakowania<input id="f_package_quantity" placeholder="np. 1 l, 500 g"></label><label>Jednostka magazynowa<input id="f_unit" value="szt."></label><label>Stan minimalny<input id="f_minimum" type="number" min="0" step="0.1" value="0"></label>
+      <input id="f_image_url" type="hidden"><input id="f_source" type="hidden">
       </div><div class="dialog-actions"><button class="secondary" data-close>Anuluj</button><button data-submit="product">Dodaj</button></div></div></div>`;
     if (this._dialog.type === 'stock') return `<div class="overlay"><div class="dialog"><h2>Dodaj stan</h2><div class="form">
       <label>Produkt<select id="f_product">${products.map(p=>`<option value="${this.esc(p.id)}" ${product?.id===p.id?'selected':''}>${this.esc(p.name)}</option>`).join('')}</select></label><label>Ilość<input id="f_quantity" type="number" min="0.001" step="0.1" value="1"></label><label>Lokalizacja<select id="f_location">${locOptions}</select></label><label>Data ważności<input id="f_expiry" type="date"></label>
@@ -196,6 +199,8 @@ class SpizarkaPanel extends HTMLElement {
     this.shadowRoot.getElementById('category')?.addEventListener('change', e => { this._category = e.target.value; this.render(); });
     this.shadowRoot.getElementById('addProduct')?.addEventListener('click', () => { this._dialog={type:'product'}; this.render(); });
     this.shadowRoot.getElementById('addStock')?.addEventListener('click', () => { this._dialog={type:'stock'}; this.render(); });
+    this.shadowRoot.getElementById('lookupEan')?.addEventListener('click', () => this.lookupEan());
+    this.shadowRoot.getElementById('f_ean')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); this.lookupEan(); } });
     this.shadowRoot.querySelectorAll('[data-action]').forEach(b => b.addEventListener('click', () => {
       this._dialog = { type: b.dataset.action === 'add' ? 'stock' : b.dataset.action, productId: b.dataset.id };
       this.render();
@@ -211,10 +216,42 @@ class SpizarkaPanel extends HTMLElement {
 
   val(id) { return this.shadowRoot.getElementById(id)?.value ?? ''; }
 
+  async lookupEan() {
+    if (this._lookupBusy) return;
+    const ean = this.val('f_ean').trim();
+    if (!ean) { alert('Wpisz lub zeskanuj kod EAN.'); return; }
+    const button = this.shadowRoot.getElementById('lookupEan');
+    const status = this.shadowRoot.getElementById('lookupStatus');
+    this._lookupBusy = true;
+    if (button) { button.disabled = true; button.textContent = 'Pobieram…'; }
+    if (status) status.textContent = 'Wyszukiwanie produktu…';
+    try {
+      const result = await this._hass.connection.sendMessagePromise({ type: 'spizarka/lookup_ean', ean });
+      if (!result?.found) {
+        if (status) status.textContent = 'Nie znaleziono produktu. Możesz uzupełnić dane ręcznie.';
+        return;
+      }
+      const set = (id, value) => { const el=this.shadowRoot.getElementById(id); if (el && value) el.value=value; };
+      set('f_ean', result.ean);
+      set('f_name', result.name);
+      set('f_brand', result.brand);
+      set('f_category', result.category);
+      set('f_package_quantity', result.package_quantity);
+      set('f_image_url', result.image_url);
+      set('f_source', result.source);
+      if (status) status.textContent = `Znaleziono${result.brand ? `: ${result.brand}` : ''}${result.package_quantity ? ` • ${result.package_quantity}` : ''}. Sprawdź dane i kliknij Dodaj.`;
+    } catch (err) {
+      if (status) status.textContent = `Błąd pobierania: ${err?.message || err}`;
+    } finally {
+      this._lookupBusy = false;
+      if (button) { button.disabled = false; button.textContent = 'Pobierz po EAN'; }
+    }
+  }
+
   async submit(kind) {
     if (kind === 'product') {
       const name=this.val('f_name').trim(); if(!name) throw new Error('Podaj nazwę produktu.');
-      await this._hass.callService('spizarka','add_product',{name,ean:this.val('f_ean').trim()||undefined,category:this.val('f_category').trim()||undefined,unit:this.val('f_unit').trim()||'szt.',minimum:Number(this.val('f_minimum')||0)}); return;
+      await this._hass.callService('spizarka','add_product',{name,ean:this.val('f_ean').trim()||undefined,category:this.val('f_category').trim()||undefined,unit:this.val('f_unit').trim()||'szt.',minimum:Number(this.val('f_minimum')||0),brand:this.val('f_brand').trim()||undefined,package_quantity:this.val('f_package_quantity').trim()||undefined,image_url:this.val('f_image_url').trim()||undefined,source:this.val('f_source').trim()||undefined}); return;
     }
     if (kind === 'stock') {
       await this._hass.callService('spizarka','add_stock',{product_id:this.val('f_product'),quantity:Number(this.val('f_quantity')),location:this.val('f_location'),expiry_date:this.val('f_expiry')||undefined}); return;

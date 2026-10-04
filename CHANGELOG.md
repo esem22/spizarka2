@@ -1,5 +1,16 @@
 # Historia zmian
 
+## 0.2.1
+
+- dodano przycisk **Pobierz po EAN** w formularzu nowego produktu,
+- pobieranie danych przez backend Home Assistant z Open Food Facts,
+- obsługa kodów EAN/GTIN od 8 do 14 cyfr,
+- automatyczne uzupełnianie nazwy, marki, kategorii i wielkości opakowania,
+- zapis marki, wielkości opakowania, źródła i adresu zdjęcia produktu,
+- marka i wielkość opakowania są widoczne na liście produktów,
+- jeśli EAN nie zostanie znaleziony, produkt nadal można dodać ręcznie,
+- zachowana zgodność danych z 0.1.0 i 0.2.0.
+
 ## 0.2.0
 
 - dodano własny panel **Spiżarka** w menu bocznym Home Assistant,

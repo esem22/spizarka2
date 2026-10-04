@@ -30,6 +30,23 @@ add_product:
         number:
           min: 0
           step: 0.1
+    brand:
+      name: Marka
+      selector:
+        text:
+    package_quantity:
+      name: Wielkość opakowania
+      example: 1 l
+      selector:
+        text:
+    image_url:
+      name: Adres zdjęcia
+      selector:
+        text:
+    source:
+      name: Źródło danych
+      selector:
+        text:
 
 add_location:
   name: Dodaj lokalizację

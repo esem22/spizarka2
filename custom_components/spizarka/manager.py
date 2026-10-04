@@ -85,7 +85,18 @@ class SpizarkaManager:
         await self._async_save()
         return location
 
-    async def add_product(self, name: str, ean: str | None, category: str | None, unit: str, minimum: float) -> dict[str, Any]:
+    async def add_product(
+        self,
+        name: str,
+        ean: str | None,
+        category: str | None,
+        unit: str,
+        minimum: float,
+        brand: str | None = None,
+        package_quantity: str | None = None,
+        image_url: str | None = None,
+        source: str | None = None,
+    ) -> dict[str, Any]:
         if ean and any(p.get("ean") == ean for p in self.data["products"]):
             raise HomeAssistantError("Produkt z tym EAN już istnieje.")
         product = {
@@ -95,6 +106,10 @@ class SpizarkaManager:
             "category": category or None,
             "unit": unit.strip() or "szt.",
             "minimum": float(minimum),
+            "brand": brand or None,
+            "package_quantity": package_quantity or None,
+            "image_url": image_url or None,
+            "source": source or None,
         }
         self.data["products"].append(product)
         await self._async_save()
